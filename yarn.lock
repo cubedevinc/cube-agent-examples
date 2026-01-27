@@ -678,7 +678,7 @@ __metadata:
   dependencies:
     "@ant-design/icons": "npm:^5.6.1"
     "@cube-dev/console-public-sdk": "npm:^0.0.1"
-    "@cube-dev/embed-sdk": "npm:^0.0.4"
+    "@cube-dev/embed-sdk": "npm:^0.0.5"
     "@cube-dev/ui-kit": "npm:^0.104.0"
     "@cubejs-client/core": "npm:^1.6.6"
     "@cubejs-client/react": "npm:^1.6.6"
@@ -794,10 +794,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cube-dev/embed-sdk@npm:^0.0.4":
-  version: 0.0.4
-  resolution: "@cube-dev/embed-sdk@npm:0.0.4"
-  checksum: 10c0/df6b1cbcede86cf608b2341af04226dcd51affda69325ca6fe1504a2091b3751c5cd3c75c74c7304ab32b7111707e13f02a91e2408f0946f7ab89d83a433ed8d
+"@cube-dev/embed-sdk@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "@cube-dev/embed-sdk@npm:0.0.5"
+  checksum: 10c0/5703eae59cd480e8a3ea15b203b7e80f4f5f3eda7ac4d4978d91fa4ded200028f3221586253541189b92a155f686034e230fb7a50babffd7d76a32f0f96aea72
   languageName: node
   linkType: hard
 
