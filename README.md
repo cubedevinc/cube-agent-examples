@@ -11,7 +11,7 @@ Examples demonstrating how to integrate Cube AI Agents into your applications us
 
 See each folder's README for detailed setup and usage instructions.
 
-## Environment Variables
+## Environment Variables.
 
 ```bash
 CUBE_TENANT_NAME=your-tenant-name
