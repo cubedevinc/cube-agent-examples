@@ -1,0 +1,38 @@
+{
+  "name": "@cube-agent-examples/antd-cube-embed-sdk",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.6.1",
+    "@cube-dev/console-public-sdk": "^0.0.1",
+    "@cube-dev/embed-sdk": "^0.0.4",
+    "@cube-dev/ui-kit": "^0.104.0",
+    "@cubejs-client/core": "^1.6.6",
+    "@cubejs-client/react": "^1.6.6",
+    "@cubejs-client/ws-transport": "^1.6.6",
+    "@tanstack/query-async-storage-persister": "^5.90.22",
+    "@tanstack/react-query": "^5.62.16",
+    "antd": "^6.2.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  }
+}

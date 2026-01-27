@@ -1,5 +1,5 @@
 {
-  "name": "langgraph-analytics-workflow",
+  "name": "@cube-agent-examples/langgraph-analytics",
   "version": "1.0.0",
   "description": "LangGraph.js workflow example using Cube AI Agents",
   "type": "module",
@@ -19,8 +19,8 @@
   "author": "Cube Dev",
   "license": "MIT",
   "dependencies": {
-    "@langchain/langgraph": "^0.2.20",
     "@langchain/core": "^0.3.20",
+    "@langchain/langgraph": "^0.2.20",
     "dotenv": "^16.4.0"
   }
 }

@@ -1,0 +1,14 @@
+{
+  "name": "cube-agent-examples",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "yarn@4.12.0",
+  "workspaces": [
+    "examples/*"
+  ],
+  "scripts": {
+    "chat-api": "yarn workspace @cube-agent-examples/chat-api start",
+    "langgraph": "yarn workspace @cube-agent-examples/langgraph-analytics start",
+    "react-app": "yarn workspace @cube-agent-examples/react-app dev"
+  }
+}

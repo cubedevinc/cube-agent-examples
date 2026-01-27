@@ -1,5 +1,5 @@
 {
-  "name": "chat-api",
+  "name": "@cube-agent-examples/chat-api",
   "version": "1.0.0",
   "description": "Cube Chat API example using the shared Cube Agent Client library",
   "type": "module",
