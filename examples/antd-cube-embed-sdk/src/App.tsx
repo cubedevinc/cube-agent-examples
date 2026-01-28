@@ -8,12 +8,9 @@ import {
 import { Typography, Spin } from "antd";
 
 import {
-  DataAssetsContextProvider,
-  CubeApiContextProvider,
-  ReportProvider,
+  EmbedProvider,
   createDefaultReport,
   Report,
-  ChartBuilderProvider,
 } from "@cube-dev/embed-sdk";
 import {
   embedPublicControllerGenerateSessionMutation,
@@ -185,24 +182,20 @@ function AppContent() {
   }
 
   return (
-    <CubeApiContextProvider token={cubeApiToken} apiUrl={cubeApiUrl}>
-      <DataAssetsContextProvider>
-        <ReportProvider
-          report={report}
-          onReportUpdate={handleReportUpdate}
-          onError={console.error}
-        >
-          <ChartBuilderProvider>
-            <div style={{ padding: 24 }}>
-              <Title level={3} style={{ marginBottom: 24 }}>
-                React Library Test
-              </Title>
-              <ReactLibExplorer />
-            </div>
-          </ChartBuilderProvider>
-        </ReportProvider>
-      </DataAssetsContextProvider>
-    </CubeApiContextProvider>
+    <EmbedProvider
+      token={cubeApiToken}
+      apiUrl={cubeApiUrl}
+      report={report}
+      onReportUpdate={handleReportUpdate}
+      onError={console.error}
+    >
+      <div style={{ padding: 24 }}>
+        <Title level={3} style={{ marginBottom: 24 }}>
+          React Library Test
+        </Title>
+        <ReactLibExplorer />
+      </div>
+    </EmbedProvider>
   );
 }
 

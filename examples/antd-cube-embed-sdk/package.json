@@ -6,13 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "tsc:watch": "tsc --watch",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
     "@cube-dev/console-public-sdk": "^0.0.1",
-    "@cube-dev/embed-sdk": "^0.0.5",
+    "@cube-dev/embed-sdk": "^0.0.9",
     "@cube-dev/ui-kit": "^0.104.0",
     "@cubejs-client/core": "^1.6.6",
     "@cubejs-client/react": "^1.6.6",

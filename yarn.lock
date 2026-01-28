@@ -678,7 +678,7 @@ __metadata:
   dependencies:
     "@ant-design/icons": "npm:^5.6.1"
     "@cube-dev/console-public-sdk": "npm:^0.0.1"
-    "@cube-dev/embed-sdk": "npm:^0.0.5"
+    "@cube-dev/embed-sdk": "npm:^0.0.9"
     "@cube-dev/ui-kit": "npm:^0.104.0"
     "@cubejs-client/core": "npm:^1.6.6"
     "@cubejs-client/react": "npm:^1.6.6"
@@ -794,10 +794,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cube-dev/embed-sdk@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "@cube-dev/embed-sdk@npm:0.0.5"
-  checksum: 10c0/5703eae59cd480e8a3ea15b203b7e80f4f5f3eda7ac4d4978d91fa4ded200028f3221586253541189b92a155f686034e230fb7a50babffd7d76a32f0f96aea72
+"@cube-dev/embed-sdk@npm:^0.0.9":
+  version: 0.0.9
+  resolution: "@cube-dev/embed-sdk@npm:0.0.9"
+  dependencies:
+    "@cubejs-client/core": "npm:^1.5.15"
+    d3-format: "npm:^3.1.0"
+    d3-time-format: "npm:^4.1.0"
+    fast-deep-equal: "npm:^3.1.3"
+    react-vega: "npm:^7.6.0"
+    use-context-selector: "npm:1.4.4"
+  peerDependencies:
+    "@tanstack/react-query": ^5.0.0
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+    vega-lite: ^6.4.1
+  checksum: 10c0/e3eb07c55bea71adea6b0f66ac7e190008e083bcd10d87ef3ee102c99a8a9594bfe571eb39a764fd3bad41174e9f11a280208fefaf502fae4d25114f5d1cd5b1
   languageName: node
   linkType: hard
 
@@ -852,7 +864,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cubejs-client/core@npm:1.6.6, @cubejs-client/core@npm:^1.6.6":
+"@cubejs-client/core@npm:1.6.6, @cubejs-client/core@npm:^1.5.15, @cubejs-client/core@npm:^1.6.6":
   version: 1.6.6
   resolution: "@cubejs-client/core@npm:1.6.6"
   dependencies:
@@ -11160,7 +11172,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-vega@npm:^7.7.1":
+"react-vega@npm:^7.6.0, react-vega@npm:^7.7.1":
   version: 7.7.1
   resolution: "react-vega@npm:7.7.1"
   dependencies:
@@ -12632,6 +12644,23 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/c77e0cba9579b7746d52feaf3ce77d8c345f266c9c1ef46584ae68f54646537c87b2ad97f5219a4b1db52f97ec2905e88e5b146add1f28f7e457bd52ca1b93cf
+  languageName: node
+  linkType: hard
+
+"use-context-selector@npm:1.4.4":
+  version: 1.4.4
+  resolution: "use-context-selector@npm:1.4.4"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: "*"
+    react-native: "*"
+    scheduler: ">=0.19.0"
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 10c0/19d11287de220c79a1d26d3ad8e44e9b47389c569703711829e76229f215b72a86030c14c992dc378593a55fb48ec3d8a4558c1d6ac8b1554d47d275d33de3e9
   languageName: node
   linkType: hard
 
