@@ -26,7 +26,16 @@ This example demonstrates how to use the Cube Embed SDK with Ant Design componen
 yarn install
 ```
 
-2. Start the development server:
+2. Configure environment variables:
+```bash
+cp .env.example .env.local
+```
+
+Then edit `.env.local` and add your Cube Cloud API key and deployment ID:
+- `VITE_API_KEY` - Your Cube Cloud API key
+- `VITE_DEPLOYMENT_ID` - Your deployment ID
+
+3. Start the development server:
 ```bash
 yarn dev
 ```
