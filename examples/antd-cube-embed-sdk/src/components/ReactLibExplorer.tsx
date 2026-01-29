@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { Button, Segmented, Space, Typography } from "antd";
+import { Button, Segmented, Space, Typography, Flex } from "antd";
 import { PlayCircleOutlined, LoadingOutlined } from "@ant-design/icons";
 
 import {
@@ -15,6 +15,7 @@ import {
 import { DataAssetPanel } from "./DataAssetPanel";
 import { ResultTable } from "./ResultTable";
 import { SqlEditor } from "./SqlEditor";
+import { FilterItem } from "./FilterItem";
 
 const { Text } = Typography;
 
@@ -36,7 +37,7 @@ const CHART_TYPES: { type: VegaChartTemplateType; label: string }[] = [
 ];
 
 export function ReactLibExplorer() {
-  const { report, runQuery } = useReportContext();
+  const { report, runQuery, updateLogicalQueryAndRunQuery, selectedSemanticView } = useReportContext();
   const [viewMode, setViewMode] = useState<ViewMode>("results");
   const [selectedChartType, setSelectedChartType] =
     useState<VegaChartTemplateType | null>(null);
@@ -44,6 +45,34 @@ export function ReactLibExplorer() {
 
   const handleRun = () => {
     runQuery(report?.sqlQuery, true);
+  };
+
+  const handleFilterChange = (name: string, type: string, value: any) => {
+    if (!selectedSemanticView) return;
+
+    const currentFilters = report?.logicalQuery?.filters || [];
+    const otherFilters = currentFilters.filter((f: any) => f.name !== name);
+    const updatedFilters = [
+      ...otherFilters,
+      { name, type, value, memberType: "dimension" },
+    ];
+
+    updateLogicalQueryAndRunQuery({
+      semanticView: selectedSemanticView,
+      filters: updatedFilters,
+    });
+  };
+
+  const handleRemoveFilter = (name: string) => {
+    if (!selectedSemanticView) return;
+
+    const currentFilters = report?.logicalQuery?.filters || [];
+    const updatedFilters = currentFilters.filter((f: any) => f.name !== name);
+
+    updateLogicalQueryAndRunQuery({
+      semanticView: selectedSemanticView,
+      filters: updatedFilters,
+    });
   };
 
   const { chartColumns } = useChartBuilderContext();
@@ -79,7 +108,7 @@ export function ReactLibExplorer() {
     >
       <DataAssetPanel />
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <Flex vertical gap={12}>
         <Space>
           <Button
             type="primary"
@@ -103,10 +132,26 @@ export function ReactLibExplorer() {
 
         <SqlEditor />
 
+        {report?.logicalQuery?.filters && report.logicalQuery.filters.length > 0 && (
+          <Flex vertical gap={8}>
+            <Text type="secondary" style={{ fontSize: 12 }}>Filters:</Text>
+            <Space wrap size={8}>
+              {report.logicalQuery.filters.map((filter: any, index: number) => (
+                <FilterItem
+                  key={`${filter.name}-${index}`}
+                  filter={filter}
+                  onFilterChange={handleFilterChange}
+                  onRemove={handleRemoveFilter}
+                />
+              ))}
+            </Space>
+          </Flex>
+        )}
+
         {viewMode === "results" ? (
           <ResultTable />
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <Flex vertical gap={12}>
             <Space wrap>
               {availableChartTypes.map(({ type, label }) => (
                 <Button
@@ -125,7 +170,7 @@ export function ReactLibExplorer() {
               )}
             </Space>
             {selectedChartType && vegaSpec && report?.result?.data && (
-              <div
+              <Flex
                 ref={chartContainerRef}
                 style={{
                   height: 400,
@@ -140,11 +185,11 @@ export function ReactLibExplorer() {
                   isLoading={report?.isLoading}
                   containerRef={chartContainerRef}
                 />
-              </div>
+              </Flex>
             )}
-          </div>
+          </Flex>
         )}
-      </div>
+      </Flex>
     </div>
   );
 }

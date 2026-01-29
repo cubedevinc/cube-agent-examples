@@ -5,7 +5,7 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import { Typography, Spin } from "antd";
+import { Typography, Spin, Flex } from "antd";
 
 import {
   EmbedProvider,
@@ -22,7 +22,7 @@ import { ReactLibExplorer } from "./components/ReactLibExplorer";
 
 const { Title, Text } = Typography;
 
-const apiKey = "sk-..";
+const apiKey = "sk-...";
 
 const deploymentId = 51;
 const EMBED_TOKEN_KEY = "cube_embed_token";
@@ -172,12 +172,11 @@ function AppContent() {
 
   if (!cubeApiUrl || !cubeApiToken) {
     return (
-      <div style={{ padding: 24 }}>
-        <Title level={3}>React Library Test</Title>
+      <Flex style={{ padding: 24 }}>
         <Spin>
           <Text type="secondary">Loading Cube API configuration...</Text>
         </Spin>
-      </div>
+      </Flex>
     );
   }
 
@@ -189,12 +188,12 @@ function AppContent() {
       onReportUpdate={handleReportUpdate}
       onError={console.error}
     >
-      <div style={{ padding: 24 }}>
+      <Flex vertical style={{ padding: 24 }}>
         <Title level={3} style={{ marginBottom: 24 }}>
           React Library Test
         </Title>
         <ReactLibExplorer />
-      </div>
+      </Flex>
     </EmbedProvider>
   );
 }

@@ -1,4 +1,4 @@
-import { Input, Typography } from "antd";
+import { Input, Typography, Flex } from "antd";
 
 import { useReportContext } from "@cube-dev/embed-sdk";
 
@@ -13,7 +13,7 @@ export function SqlEditor() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <Flex vertical gap={8}>
       <Text strong style={{ fontSize: 14 }}>
         Semantic SQL
       </Text>
@@ -28,6 +28,6 @@ export function SqlEditor() {
         }}
         onChange={handleChange}
       />
-    </div>
+    </Flex>
   );
 }

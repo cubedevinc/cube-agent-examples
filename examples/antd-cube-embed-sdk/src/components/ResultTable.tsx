@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Table, Alert, Spin, Button, Space, Typography } from "antd";
+import { Table, Alert, Spin, Button, Space, Typography, Flex } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 
 import { prepareTableData, useReportContext } from "@cube-dev/embed-sdk";
@@ -56,19 +56,12 @@ export function ResultTable() {
 
   if (report?.isLoading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 32,
-        }}
-      >
+      <Flex align="center" justify="center" style={{ padding: 32 }}>
         <Spin />
-        <span style={{ marginLeft: 8, color: "rgba(0, 0, 0, 0.45)" }}>
+        <Text type="secondary" style={{ marginLeft: 8 }}>
           Loading...
-        </span>
-      </div>
+        </Text>
+      </Flex>
     );
   }
 
@@ -85,21 +78,14 @@ export function ResultTable() {
 
   if (!report?.result || dataSource.length === 0) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 32,
-        }}
-      >
+      <Flex align="center" justify="center" style={{ padding: 32 }}>
         <Text type="secondary">Run a query to see results</Text>
-      </div>
+      </Flex>
     );
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <Flex vertical gap={8}>
       <Table
         columns={columns}
         dataSource={paginatedData}
@@ -107,13 +93,7 @@ export function ResultTable() {
         size="small"
         bordered
       />
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+      <Flex align="center" justify="space-between">
         <Text type="secondary" style={{ fontSize: 14 }}>
           {dataSource.length} rows
         </Text>
@@ -134,7 +114,7 @@ export function ResultTable() {
             disabled={page >= totalPages - 1}
           />
         </Space>
-      </div>
-    </div>
+      </Flex>
+    </Flex>
   );
 }

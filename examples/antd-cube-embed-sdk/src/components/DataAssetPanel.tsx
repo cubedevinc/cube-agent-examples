@@ -1,11 +1,12 @@
 import { useCallback, useMemo } from "react";
-import { Button, Collapse, Tag, Typography } from "antd";
+import { Button, Collapse, Tag, Typography, Flex, Card, Space } from "antd";
 import {
   TableOutlined,
   NumberOutlined,
   FontSizeOutlined,
   CloseOutlined,
   CheckOutlined,
+  FilterOutlined,
 } from "@ant-design/icons";
 
 import { useDataAssetsContext, useReportContext } from "@cube-dev/embed-sdk";
@@ -38,6 +39,7 @@ interface Member {
   memberType: MemberType;
   aliasMember?: string;
   isSelected?: boolean;
+  hasFilter?: boolean;
 }
 
 interface MembersByCube {
@@ -84,12 +86,34 @@ function isMemberSelected(
   );
 }
 
+function isMemberInFilters(
+  logicalQuery:
+    | {
+        filters?: Array<{
+          name?: string;
+          type?: string;
+          value?: any;
+          memberType?: string;
+        }>;
+      }
+    | null
+    | undefined,
+  memberName: string
+): boolean {
+  if (!logicalQuery?.filters) {
+    return false;
+  }
+
+  return logicalQuery.filters.some((filter: any) => filter.name === memberName);
+}
+
 function groupMembersByCube(
   view: SemanticView,
   logicalQuery:
     | {
         dimensions?: Array<string | { name: string }>;
         measures?: Array<string | { name: string }>;
+        filters?: Array<any>;
       }
     | null
     | undefined
@@ -110,6 +134,7 @@ function groupMembersByCube(
       memberType: "dimension",
       aliasMember: dim.aliasMember,
       isSelected: isMemberSelected(logicalQuery, dim.name, "dimension"),
+      hasFilter: isMemberInFilters(logicalQuery, dim.name),
     });
   });
 
@@ -126,6 +151,7 @@ function groupMembersByCube(
       memberType: "measure",
       aliasMember: measure.aliasMember,
       isSelected: isMemberSelected(logicalQuery, measure.name, "measure"),
+      hasFilter: isMemberInFilters(logicalQuery, measure.name),
     });
   });
 
@@ -140,7 +166,10 @@ export function DataAssetPanel() {
     selectedSemanticView,
     setSelectedSemanticView,
     clearReport,
+    addFilterForColumn,
+    removeFilterByColumnId,
   } = useReportContext();
+
 
   const selectedView = useMemo(() => {
     if (!selectedSemanticView) {
@@ -197,6 +226,31 @@ export function DataAssetPanel() {
     [selectedSemanticView, report?.logicalQuery, updateLogicalQueryAndRunQuery]
   );
 
+  const handleAddFilter = useCallback((member: Member, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!member.name) {
+      console.error("Member name is undefined!", member);
+      return;
+    }
+
+    addFilterForColumn?.(member.name);
+  }, [addFilterForColumn]);
+
+  const handleRemoveFilter = useCallback(
+    (member: Member, e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      if (!member.name) {
+        console.error("Member name is undefined!", member);
+        return;
+      }
+
+      removeFilterByColumnId?.(member.name);
+    },
+    [removeFilterByColumnId]
+  );
+
   if (dataAssetsLoading) {
     return <Text type="secondary">Loading data assets...</Text>;
   }
@@ -204,24 +258,23 @@ export function DataAssetPanel() {
   const collapseItems = cubeNames.map((cubeName) => ({
     key: cubeName,
     label: (
-      <span style={{ fontWeight: 600, fontSize: 13 }}>
+      <Text strong style={{ fontSize: 13 }}>
         {cubeName}{" "}
-        <span style={{ fontWeight: 400, color: "rgba(0, 0, 0, 0.45)" }}>
+        <Text type="secondary">
           ({membersByCube[cubeName].length})
-        </span>
-      </span>
+        </Text>
+      </Text>
     ),
     children: (
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <Flex vertical gap={4}>
         {membersByCube[cubeName].map((member) => (
-          <div
+          <Flex
             key={member.name}
             role="button"
             tabIndex={0}
+            align="center"
+            gap={8}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
               padding: "4px 8px",
               borderRadius: 4,
               cursor: "pointer",
@@ -230,16 +283,18 @@ export function DataAssetPanel() {
               border: member.isSelected
                 ? "1px solid #1677ff"
                 : "1px solid transparent",
+              position: "relative",
             }}
             onClick={() => toggleMember(member)}
             onKeyDown={(e) => e.key === "Enter" && toggleMember(member)}
+            className="member-item"
           >
             {member.isSelected ? (
               <CheckOutlined style={{ color: "#1677ff", fontSize: 12 }} />
             ) : (
               getMemberIcon(member)
             )}
-            <span
+            <Text
               style={{
                 flex: 1,
                 fontSize: 13,
@@ -249,36 +304,60 @@ export function DataAssetPanel() {
               }}
             >
               {member.title || member.name}
-            </span>
-            {getMemberTypeTag(member)}
-          </div>
+            </Text>
+            <Flex align="center" gap={4}>
+              {member.memberType === "dimension" && (
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<FilterOutlined style={{ fontSize: 12 }} />}
+                  onClick={(e) => {
+                    if (member.hasFilter) {
+                      handleRemoveFilter(member, e);
+                    } else {
+                      handleAddFilter(member, e);
+                    }
+                  }}
+                  className="filter-button"
+                  style={{
+                    padding: "0 4px",
+                    height: 20,
+                    minWidth: 20,
+                    color: member.hasFilter ? "#1677ff" : undefined,
+                    opacity: member.hasFilter ? 1 : 0,
+                    transition: "opacity 0.2s",
+                  }}
+                />
+              )}
+              {getMemberTypeTag(member)}
+            </Flex>
+          </Flex>
         ))}
-      </div>
+      </Flex>
     ),
   }));
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: 400,
-        border: "1px solid #d9d9d9",
-        borderRadius: 8,
-        backgroundColor: "#fff",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <>
+      <style>
+        {`
+          .member-item:hover .filter-button {
+            opacity: 1 !important;
+          }
+        `}
+      </style>
+      <Card
+        style={{ width: "100%", height: 400 }}
+        styles={{ body: { padding: 0, height: "100%", display: "flex", flexDirection: "column" } }}
+      >
       {selectedView ? (
         <>
-          <div
+          <Flex
+            align="center"
+            gap={8}
             style={{
               padding: "8px 12px",
               borderBottom: "1px solid #d9d9d9",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
             }}
           >
             <Button
@@ -290,11 +369,11 @@ export function DataAssetPanel() {
                 setSelectedSemanticView(null);
               }}
             />
-            <span style={{ fontWeight: 600, flex: 1, fontSize: 14 }}>
+            <Text strong style={{ flex: 1, fontSize: 14 }}>
               {selectedView.title || selectedView.name}
-            </span>
-          </div>
-          <div style={{ flex: 1, overflow: "auto", padding: 8 }}>
+            </Text>
+          </Flex>
+          <Flex vertical style={{ flex: 1, overflow: "auto", padding: 8 }}>
             {cubeNames.length > 0 ? (
               <Collapse
                 defaultActiveKey={cubeNames}
@@ -302,41 +381,33 @@ export function DataAssetPanel() {
                 items={collapseItems}
               />
             ) : (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "100%",
-                }}
-              >
+              <Flex align="center" justify="center" style={{ height: "100%" }}>
                 <Text type="secondary">No members in this view</Text>
-              </div>
+              </Flex>
             )}
-          </div>
+          </Flex>
         </>
       ) : (
         <>
-          <div
+          <Flex
             style={{
               padding: "12px 16px",
               borderBottom: "1px solid #d9d9d9",
             }}
           >
-            <span style={{ fontWeight: 600, fontSize: 14 }}>Views</span>
-          </div>
-          <div style={{ flex: 1, overflow: "auto" }}>
+            <Text strong style={{ fontSize: 14 }}>Views</Text>
+          </Flex>
+          <Flex vertical style={{ flex: 1, overflow: "auto" }}>
             {(semanticViews as SemanticView[]).map((view) => (
-              <div
+              <Flex
                 key={view.name}
                 role="button"
                 tabIndex={0}
+                align="center"
+                gap={8}
                 style={{
                   width: "100%",
                   padding: "8px 16px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
                   cursor: "pointer",
                   fontSize: 14,
                   transition: "background-color 0.2s",
@@ -354,11 +425,12 @@ export function DataAssetPanel() {
               >
                 <TableOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
                 {view.title || view.name}
-              </div>
+              </Flex>
             ))}
-          </div>
+          </Flex>
         </>
       )}
-    </div>
+    </Card>
+  </>
   );
 }
