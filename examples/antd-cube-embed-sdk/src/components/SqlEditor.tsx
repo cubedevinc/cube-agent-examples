@@ -1,6 +1,6 @@
-import { Input, Typography, Flex } from "antd";
+import { Input, Typography, Flex } from 'antd';
 
-import { useReportContext } from "@cube-dev/embed-sdk";
+import { useReportContext } from '@cube-dev/embed-sdk';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -14,17 +14,16 @@ export function SqlEditor() {
 
   return (
     <Flex vertical gap={8}>
-      <Text strong style={{ fontSize: 14 }}>
-        Semantic SQL
-      </Text>
+      <Text strong>Semantic SQL</Text>
+      
       <TextArea
-        value={report?.sqlQuery || ""}
+        value={report?.sqlQuery || ''}
         placeholder="SELECT * FROM my_view"
         style={{
           minHeight: 120,
-          fontFamily: "monospace",
+          fontFamily: 'monospace',
           fontSize: 13,
-          resize: "vertical",
+          resize: 'vertical',
         }}
         onChange={handleChange}
       />

@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
-import { Table, Alert, Spin, Button, Space, Typography, Flex } from "antd";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { useMemo, useState } from 'react';
+import { Table, Alert, Spin, Button, Space, Typography, Flex } from 'antd';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
-import { prepareTableData, useReportContext } from "@cube-dev/embed-sdk";
+import { prepareTableData, useReportContext } from '@cube-dev/embed-sdk';
 
 const { Text } = Typography;
 
@@ -36,7 +36,7 @@ export function ResultTable() {
       width: 200,
       render: col.render
         ? (value: any) => col.render({ value })
-        : (value: any) => String(value ?? ""),
+        : (value: any) => String(value ?? ''),
     }));
   }, [tableData.columns]);
 

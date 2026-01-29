@@ -1,32 +1,32 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 import {
   QueryClient,
   QueryClientProvider,
   useMutation,
   useQuery,
-} from "@tanstack/react-query";
-import { Typography, Spin, Flex } from "antd";
+} from '@tanstack/react-query';
+import { Typography, Spin, Flex } from 'antd';
 
 import {
   EmbedProvider,
   createDefaultReport,
   Report,
-} from "@cube-dev/embed-sdk";
+} from '@cube-dev/embed-sdk';
 import {
   embedPublicControllerGenerateSessionMutation,
   embedPublicControllerPostTokenBySessionIdMutation,
   deploymentsGetDeploymentOptions,
   deploymentsPublicControllerDeploymentTokenMutation,
-} from "@cube-dev/console-public-sdk";
-import { ReactLibExplorer } from "./components/ReactLibExplorer";
+} from '@cube-dev/console-public-sdk';
+import { ReactLibExplorer } from './components/ReactLibExplorer';
 
 const { Title, Text } = Typography;
 
-const apiKey = "sk-...";
+const CLOUD_API_KEY = import.meta.env.VITE_API_KEY;
+const DEPLOYMENT_ID = import.meta.env.VITE_DEPLOYMENT_ID;
 
-const deploymentId = 51;
-const EMBED_TOKEN_KEY = "cube_embed_token";
-const REPORT_STORAGE_KEY = "cube_react_lib_report";
+const EMBED_TOKEN_KEY = 'cube_embed_token';
+const REPORT_STORAGE_KEY = 'cube_react_lib_report';
 
 function loadReportFromStorage(): Report {
   try {
@@ -35,7 +35,7 @@ function loadReportFromStorage(): Report {
       return { ...createDefaultReport(), ...JSON.parse(stored) };
     }
   } catch (e) {
-    console.error("Failed to load report from storage:", e);
+    console.error('Failed to load report from storage:', e);
   }
 
   return createDefaultReport();
@@ -46,24 +46,24 @@ function saveReportToStorage(report: Report) {
     const { result, isLoading, error, ...persistable } = report;
     localStorage.setItem(REPORT_STORAGE_KEY, JSON.stringify(persistable));
   } catch (e) {
-    console.error("Failed to save report to storage:", e);
+    console.error('Failed to save report to storage:', e);
   }
 }
 
 function isTokenExpired(token: string): boolean {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    const payload = JSON.parse(atob(token.split('.')[1]));
     const expirationTime = payload.exp * 1000;
     return Date.now() >= expirationTime;
   } catch (error) {
-    console.error("Error parsing token:", error);
+    console.error('Error parsing token:', error);
     return true;
   }
 }
 
 const queryClient = new QueryClient();
 
-function AppContent() {
+export function App() {
   const [embedToken, setEmbedToken] = useState<string | null>(() => {
     const storedToken = localStorage.getItem(EMBED_TOKEN_KEY);
     if (storedToken && !isTokenExpired(storedToken)) {
@@ -88,7 +88,7 @@ function AppContent() {
   const generateSessionMutation = useMutation({
     ...embedPublicControllerGenerateSessionMutation({
       headers: {
-        Authorization: `Api-Key ${apiKey}`,
+        Authorization: `Api-Key ${CLOUD_API_KEY}`,
       },
     }),
   });
@@ -107,7 +107,7 @@ function AppContent() {
   const { data: deployment } = useQuery({
     ...deploymentsGetDeploymentOptions({
       path: {
-        deploymentId,
+        deploymentId: DEPLOYMENT_ID,
       },
       headers: embedToken
         ? {
@@ -131,22 +131,22 @@ function AppContent() {
 
   // Fetch Cube API token when embed token is available
   useEffect(() => {
-    if (embedToken && deploymentId && !cubeApiTokenMutation.data) {
+    if (embedToken && DEPLOYMENT_ID && !cubeApiTokenMutation.data) {
       cubeApiTokenMutation.mutate({
         path: {
-          deploymentId,
+          deploymentId: DEPLOYMENT_ID,
         },
       });
     }
-  }, [embedToken, deploymentId]);
+  }, [embedToken, DEPLOYMENT_ID]);
 
   // Auto-generate session and token if not present or expired
   useEffect(() => {
     if (!embedToken && !generateSessionMutation.isPending) {
       generateSessionMutation.mutate({
         body: {
-          deploymentId,
-          externalId: "test@example.com",
+          deploymentId: DEPLOYMENT_ID,
+          externalId: 'test@example.com',
           isEphemeral: true,
         },
       });
@@ -181,29 +181,21 @@ function AppContent() {
   }
 
   return (
-    <EmbedProvider
-      token={cubeApiToken}
-      apiUrl={cubeApiUrl}
-      report={report}
-      onReportUpdate={handleReportUpdate}
-      onError={console.error}
-    >
-      <Flex vertical style={{ padding: 24 }}>
-        <Title level={3} style={{ marginBottom: 24 }}>
-          React Library Test
-        </Title>
-        <ReactLibExplorer />
-      </Flex>
-    </EmbedProvider>
-  );
-}
-
-function App() {
-  return (
     <QueryClientProvider client={queryClient}>
-      <AppContent />
+      <EmbedProvider
+        token={cubeApiToken}
+        apiUrl={cubeApiUrl}
+        report={report}
+        onReportUpdate={handleReportUpdate}
+        onError={console.error}
+      >
+        <Flex vertical style={{ padding: 24 }}>
+          <Title level={3} style={{ marginBottom: 24 }}>
+            Cube Embed SDK Example
+          </Title>
+          <ReactLibExplorer />
+        </Flex>
+      </EmbedProvider>
     </QueryClientProvider>
   );
 }
-
-export default App;
