@@ -55,15 +55,3 @@ src/
 ├── main.tsx                  # Entry point
 └── index.css                 # Global styles
 ```
-
-## Component Mapping (shadcn -> antd)
-
-| shadcn/ui | Ant Design |
-|-----------|------------|
-| Button | Button |
-| Alert | Alert |
-| Table | Table |
-| Textarea | Input.TextArea |
-| Badge | Tag |
-| Collapsible | Collapse |
-| ToggleGroup | Segmented |
