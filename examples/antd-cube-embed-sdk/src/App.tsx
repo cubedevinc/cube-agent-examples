@@ -1,10 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import {
-  QueryClient,
-  QueryClientProvider,
-  useMutation,
-  useQuery,
-} from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Typography, Spin, Flex } from 'antd';
 
 import {
@@ -12,18 +7,20 @@ import {
   createDefaultReport,
   Report,
 } from '@cube-dev/embed-sdk';
+import { createCubeCloudApiClient } from '@cube-dev/console-public-sdk';
 import {
-  embedPublicControllerGenerateSessionMutation,
-  embedPublicControllerPostTokenBySessionIdMutation,
-  deploymentsGetDeploymentOptions,
-  deploymentsPublicControllerDeploymentTokenMutation,
-} from '@cube-dev/console-public-sdk';
+  CubeCloudApiProvider,
+  useCubeCloudApiMutation,
+  useCubeCloudApiQuery,
+} from '@cube-dev/console-public-sdk/react-query';
 import { ReactLibExplorer } from './components/ReactLibExplorer';
 
 const { Title, Text } = Typography;
 
 const CLOUD_API_KEY = import.meta.env.VITE_API_KEY;
-const DEPLOYMENT_ID = import.meta.env.VITE_DEPLOYMENT_ID;
+const DEPLOYMENT_ID = parseInt(import.meta.env.VITE_DEPLOYMENT_ID, 10);
+const CLOUD_API_URL =
+  import.meta.env.VITE_CLOUD_API_URL || 'https://tenant.cubecloud.dev';
 
 const EMBED_TOKEN_KEY = 'cube_embed_token';
 const REPORT_STORAGE_KEY = 'cube_react_lib_report';
@@ -63,16 +60,7 @@ function isTokenExpired(token: string): boolean {
 
 const queryClient = new QueryClient();
 
-export function App() {
-  const [embedToken, setEmbedToken] = useState<string | null>(() => {
-    const storedToken = localStorage.getItem(EMBED_TOKEN_KEY);
-    if (storedToken && !isTokenExpired(storedToken)) {
-      return storedToken;
-    }
-
-    return null;
-  });
-
+function AppContent({ embedToken }: { embedToken: string }) {
   const [report, setReport] = useState<Report>(loadReportFromStorage);
 
   const handleReportUpdate = useCallback((updates: Partial<Report>) => {
@@ -84,86 +72,40 @@ export function App() {
     });
   }, []);
 
-  // Should be done on backend only; this is just for testing purposes
-  const generateSessionMutation = useMutation({
-    ...embedPublicControllerGenerateSessionMutation({
-      headers: {
-        Authorization: `Api-Key ${CLOUD_API_KEY}`,
-      },
-    }),
-  });
-
-  const getTokenMutation = useMutation({
-    ...embedPublicControllerPostTokenBySessionIdMutation(),
-    onSuccess(data) {
-      if (data.token) {
-        localStorage.setItem(EMBED_TOKEN_KEY, data.token);
-        setEmbedToken(data.token);
-      }
-    },
-  });
-
-  // Fetch deployment info using embed token
-  const { data: deployment } = useQuery({
-    ...deploymentsGetDeploymentOptions({
-      path: {
-        deploymentId: DEPLOYMENT_ID,
-      },
-      headers: embedToken
-        ? {
-            Authorization: `Embed-Token ${embedToken}`,
-          }
-        : undefined,
-    }),
-    enabled: !!embedToken,
-  });
-
-  // Fetch Cube API token using embed token
-  const cubeApiTokenMutation = useMutation({
-    ...deploymentsPublicControllerDeploymentTokenMutation({
-      headers: embedToken
-        ? {
-            Authorization: `Embed-Token ${embedToken}`,
-          }
-        : undefined,
-    }),
-  });
-
-  // Fetch Cube API token when embed token is available
-  useEffect(() => {
-    if (embedToken && DEPLOYMENT_ID && !cubeApiTokenMutation.data) {
-      cubeApiTokenMutation.mutate({
+  const { data: deployment } = useCubeCloudApiQuery(
+    'get',
+    '/api/v1/deployments/{deploymentId}',
+    {
+      params: {
         path: {
           deploymentId: DEPLOYMENT_ID,
         },
-      });
-    }
-  }, [embedToken, DEPLOYMENT_ID]);
+      },
+      headers: {
+        Authorization: `Embed-Token ${embedToken}`,
+      },
+    },
+  );
 
-  // Auto-generate session and token if not present or expired
+  const cubeApiTokenMutation = useCubeCloudApiMutation(
+    'post',
+    '/api/v1/deployments/{deploymentId}/token',
+  );
+
   useEffect(() => {
-    if (!embedToken && !generateSessionMutation.isPending) {
-      generateSessionMutation.mutate({
-        body: {
-          deploymentId: DEPLOYMENT_ID,
-          externalId: 'test@example.com',
-          isEphemeral: true,
+    if (embedToken && DEPLOYMENT_ID && !cubeApiTokenMutation.data) {
+      cubeApiTokenMutation.mutate({
+        params: {
+          path: {
+            deploymentId: DEPLOYMENT_ID,
+          },
+        },
+        headers: {
+          Authorization: `Embed-Token ${embedToken}`,
         },
       });
     }
-  }, [embedToken, generateSessionMutation.isPending]);
-
-  // Exchange session for token
-  useEffect(() => {
-    const sessionId = generateSessionMutation.data?.sessionId;
-    if (sessionId) {
-      getTokenMutation.mutate({
-        body: {
-          sessionId,
-        },
-      });
-    }
-  }, [generateSessionMutation.data?.sessionId]);
+  }, [embedToken]);
 
   const cubeApiUrl = deployment
     ? `${deployment.deploymentUrl}/cubejs-api/v1`
@@ -181,21 +123,112 @@ export function App() {
   }
 
   return (
+    <EmbedProvider
+      token={cubeApiToken}
+      apiUrl={cubeApiUrl}
+      report={report}
+      onReportUpdate={handleReportUpdate}
+      onError={console.error}
+    >
+      <Flex vertical style={{ padding: 24 }}>
+        <Title level={3} style={{ marginBottom: 24 }}>
+          Cube Embed SDK Example
+        </Title>
+        <ReactLibExplorer />
+      </Flex>
+    </EmbedProvider>
+  );
+}
+
+function AuthFlow({
+  onTokenReceived,
+}: {
+  onTokenReceived: (token: string) => void;
+}) {
+  const generateSessionMutation = useCubeCloudApiMutation(
+    'post',
+    '/api/v1/embed/generate-session',
+  );
+
+  const getTokenMutation = useCubeCloudApiMutation(
+    'post',
+    '/api/v1/embed/session/token',
+    {
+      onSuccess(data) {
+        if (data.token) {
+          localStorage.setItem(EMBED_TOKEN_KEY, data.token);
+          onTokenReceived(data.token);
+        }
+      },
+    },
+  );
+
+  useEffect(() => {
+    if (!generateSessionMutation.isPending && !generateSessionMutation.data) {
+      generateSessionMutation.mutate({
+        headers: {
+          Authorization: `Api-Key ${CLOUD_API_KEY}`,
+        },
+        body: {
+          deploymentId: DEPLOYMENT_ID,
+          externalId: 'test@example.com',
+          isEphemeral: true,
+        },
+      });
+    }
+  }, [generateSessionMutation.isPending, generateSessionMutation.data]);
+
+  useEffect(() => {
+    const sessionId = generateSessionMutation.data?.sessionId;
+    if (sessionId && !getTokenMutation.isPending && !getTokenMutation.data) {
+      getTokenMutation.mutate({
+        body: {
+          sessionId,
+        },
+      });
+    }
+  }, [
+    generateSessionMutation.data?.sessionId,
+    getTokenMutation.isPending,
+    getTokenMutation.data,
+  ]);
+
+  return (
+    <Flex style={{ padding: 24 }}>
+      <Spin>
+        <Text type="secondary">Authenticating...</Text>
+      </Spin>
+    </Flex>
+  );
+}
+
+export function App() {
+  const [embedToken, setEmbedToken] = useState<string | null>(() => {
+    const storedToken = localStorage.getItem(EMBED_TOKEN_KEY);
+    if (storedToken && !isTokenExpired(storedToken)) {
+      return storedToken;
+    }
+
+    return null;
+  });
+
+  const client = useMemo(
+    () =>
+      createCubeCloudApiClient({
+        baseUrl: CLOUD_API_URL,
+      }),
+    [],
+  );
+
+  return (
     <QueryClientProvider client={queryClient}>
-      <EmbedProvider
-        token={cubeApiToken}
-        apiUrl={cubeApiUrl}
-        report={report}
-        onReportUpdate={handleReportUpdate}
-        onError={console.error}
-      >
-        <Flex vertical style={{ padding: 24 }}>
-          <Title level={3} style={{ marginBottom: 24 }}>
-            Cube Embed SDK Example
-          </Title>
-          <ReactLibExplorer />
-        </Flex>
-      </EmbedProvider>
+      <CubeCloudApiProvider client={client}>
+        {embedToken ? (
+          <AppContent embedToken={embedToken} />
+        ) : (
+          <AuthFlow onTokenReceived={setEmbedToken} />
+        )}
+      </CubeCloudApiProvider>
     </QueryClientProvider>
   );
 }

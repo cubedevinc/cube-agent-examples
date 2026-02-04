@@ -677,8 +677,8 @@ __metadata:
   resolution: "@cube-agent-examples/antd-cube-embed-sdk@workspace:examples/antd-cube-embed-sdk"
   dependencies:
     "@ant-design/icons": "npm:^5.6.1"
-    "@cube-dev/console-public-sdk": "npm:^0.0.1"
-    "@cube-dev/embed-sdk": "npm:^0.0.9"
+    "@cube-dev/console-public-sdk": "npm:^0.0.11"
+    "@cube-dev/embed-sdk": "npm:^0.0.10"
     "@cube-dev/ui-kit": "npm:^0.104.0"
     "@cubejs-client/core": "npm:^1.6.6"
     "@cubejs-client/react": "npm:^1.6.6"
@@ -779,24 +779,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cube-dev/console-public-sdk@npm:^0.0.1":
-  version: 0.0.1
-  resolution: "@cube-dev/console-public-sdk@npm:0.0.1"
+"@cube-dev/console-public-sdk@npm:^0.0.11":
+  version: 0.0.11
+  resolution: "@cube-dev/console-public-sdk@npm:0.0.11"
+  dependencies:
+    openapi-fetch: "npm:^0.13.0"
+    openapi-react-query: "npm:^0.2.0"
   peerDependencies:
     "@tanstack/react-query": ^5.0.0
-    axios: ^1.8.2
+    react: ^18.0.0 || ^19.0.0
   peerDependenciesMeta:
     "@tanstack/react-query":
       optional: true
-    axios:
+    react:
       optional: true
-  checksum: 10c0/2a50bb27a41d1c2102bec1a442de9ffd44adf2950efa366d812dbcd67d36749b11197521ea5ed8733c4605ab35edb0a2d8750e14385d25df6bf500f9481df779
+  checksum: 10c0/5a2308bcf7d3c03a7bf5d7289a7bc33b2a7f8906ef7168cd40a753129408e2443bebd0f71bb122c82cc096db2ab0441e0b2e474333079ac16c6118015b39562e
   languageName: node
   linkType: hard
 
-"@cube-dev/embed-sdk@npm:^0.0.9":
-  version: 0.0.9
-  resolution: "@cube-dev/embed-sdk@npm:0.0.9"
+"@cube-dev/embed-sdk@npm:^0.0.10":
+  version: 0.0.10
+  resolution: "@cube-dev/embed-sdk@npm:0.0.10"
   dependencies:
     "@cubejs-client/core": "npm:^1.5.15"
     d3-format: "npm:^3.1.0"
@@ -809,7 +812,7 @@ __metadata:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
     vega-lite: ^6.4.1
-  checksum: 10c0/e3eb07c55bea71adea6b0f66ac7e190008e083bcd10d87ef3ee102c99a8a9594bfe571eb39a764fd3bad41174e9f11a280208fefaf502fae4d25114f5d1cd5b1
+  checksum: 10c0/7876ad9921938648c7cfbf905cb0d3b90584271b9236b17ce6432acb278ed1792a47bd69e88cd4690f0d94034813732542b9cf7ea86e89f0caf41499c0a4a0df
   languageName: node
   linkType: hard
 
@@ -10399,12 +10402,40 @@ __metadata:
   languageName: node
   linkType: hard
 
+"openapi-fetch@npm:^0.13.0":
+  version: 0.13.8
+  resolution: "openapi-fetch@npm:0.13.8"
+  dependencies:
+    openapi-typescript-helpers: "npm:^0.0.15"
+  checksum: 10c0/28fd9b2f23be8ed1b8ac489ae9715b087de6a70be4ce3c40285d9a1fa1f033ecd2d08f767765c5a45a1797bb0996bd331cc57fb5bac1e259d999b58567f029ac
+  languageName: node
+  linkType: hard
+
 "openapi-fetch@npm:^0.9.7":
   version: 0.9.8
   resolution: "openapi-fetch@npm:0.9.8"
   dependencies:
     openapi-typescript-helpers: "npm:^0.0.8"
   checksum: 10c0/a96590c3df4f3e6800003f1128bafd50a01113073f00ea32a6e21e8c1ec38f3dc88141448569e52e791c58088fdbee61ea4fc44b6856cc24da2768fc43fddb82
+  languageName: node
+  linkType: hard
+
+"openapi-react-query@npm:^0.2.0":
+  version: 0.2.10
+  resolution: "openapi-react-query@npm:0.2.10"
+  dependencies:
+    openapi-typescript-helpers: "npm:^0.0.15"
+  peerDependencies:
+    "@tanstack/react-query": ^5.25.0
+    openapi-fetch: ^0.13.4
+  checksum: 10c0/8509336606a03f0c8b0cfe0da55571e17d5c4935c5b813d7b9312c66376f8b60f04f854ef35c489fc58a91a0aa76e74ea89a0002e96cf33982af2497fa246aae
+  languageName: node
+  linkType: hard
+
+"openapi-typescript-helpers@npm:^0.0.15":
+  version: 0.0.15
+  resolution: "openapi-typescript-helpers@npm:0.0.15"
+  checksum: 10c0/5eb68d487b787e3e31266470b1a310726549dd45a1079655ab18066ab291b0b3c343fdf629991013706a2329b86964f8798d56ef0272b94b931fe6c19abd7a88
   languageName: node
   linkType: hard
 
